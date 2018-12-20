@@ -1,4 +1,7 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
+
+
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-button/paper-button.html">
 
@@ -9,21 +12,34 @@
         display: block;
       }
     </style>
-    <div class="login">
-      <h2>Iniciar sesión</h2>
-      <p>¿No tienes cuenta? Da clic <paper-button on-tap="toggle">aquí</paper-button>
-      <paper-input label="Nombre de usuario" value="{{username}}"></paper-input>
-      <paper-input label="Contraseña" type="password" value="{{password}}"></paper-input>
-      <paper-button on-tap="login">Iniciar sesión</paper-button>
-    </div>
-    <div class="signin">
-      <h2>Iniciar sesión</h2>
-      <paper-input label="Nombre de usuario" value="{{username}}"></paper-input>
-      <paper-input label="Contraseña" type="password" value="{{password}}"></paper-input>
-      <paper-button on-tap="login">Iniciar sesión</paper-button>
-    </div>
+    <dom-if if="[[toggle]]">
+      <template>
+        <div class="login">
+          <h2>Iniciar sesión</h2>
+          <p>¿No tienes cuenta? Da clic
+            <paper-button on-tap="setToggle">aquí</paper-button>
+            <paper-input label="Nombre de usuario" value="{{username}}"></paper-input>
+            <paper-input label="Contraseña" type="password" value="{{password}}"></paper-input>
+            <paper-button on-tap="login">Iniciar sesión</paper-button>
+        </div>
+      </template>
+    </dom-if>
+    <dom-if if="[[!toggle]]">
+      <template>
+        <div class="signin">
+          <h2>Registro</h2>
+          <p>¿Ya tienes cuenta? Da clic
+            <paper-button on-tap="setToggle">aquí</paper-button>
+            <paper-input label="Nombre de usuario" value="{{username}}"></paper-input>
+            <paper-input label="Nombres" value="{{firstName}}"></paper-input>
+            <paper-input label="Apellidos" value="{{lastName}}"></paper-input>
+            <paper-input label="Edad" value="{{age}}"></paper-input>
+            <paper-input label="Contraseña" type="password" value="{{password}}"></paper-input>
+            <paper-button on-tap="signin">Registrarse</paper-button>
+        </div>
+      </template>
+    </dom-if>
   </template>
-
   <script>
     /**
      * `login-component`
@@ -34,9 +50,16 @@
      * @demo demo/index.html
      */
     class LoginComponent extends Polymer.Element {
-      static get is() { return 'login-component'; }
+      static get is() {
+        return 'login-component';
+      }
+
       static get properties() {
         return {
+          toggle: {
+            type: Boolean,
+            value: true
+          },
           username: {
             type: String,
             value: ''
@@ -44,14 +67,54 @@
           password: {
             type: String,
             value: ''
+          },
+          firstName: {
+            type: String,
+            value: ''
+          },
+          lastName: {
+            type: String,
+            value: ''
+          },
+          age: {
+            type: String,
+            value: ''
+          },
+          picture: {
+            type: String,
+            value: 'https://www.travelcontinuously.com/wp-content/uploads/2018/04/empty-avatar.png'
           }
         };
       }
-      login(){
-        alert('usuario:' + this.username + ' pass: ' + this.password);
-      }
-      toggle() {
 
+      login() {
+        this.dispatchEvent(new CustomEvent('login-user', {
+          bubbles: false,
+          composed: false,
+          detail: {
+            username: this.username,
+            password: this.password
+          }
+        }));
+      }
+
+      signin() {
+        this.dispatchEvent(new CustomEvent('register-user', {
+          bubbles: false,
+          composed: false,
+          detail: {
+            username: this.username,
+            password: this.password,
+            firstName: this.firstName,
+            lastName: this.lastName,
+            age: this.age,
+            image: this.picture
+          }
+        }));
+      }
+
+      setToggle() {
+        this.set('toggle', !this.toggle);
       }
     }
 
